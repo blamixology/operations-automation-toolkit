@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "name": "compressed-application-logs",
+      "path": "../examples/logs",
+      "pattern": "*.log.*.gz",
+      "older_than_days": 14,
+      "protect": ["audit-*", "keep-*"]
+    }
+  ]
+}
+

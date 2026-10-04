@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "operations-automation-toolkit"
+version = "1.0.0"
+description = "Safety-first fleet health, certificate, backup, and cleanup automation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Mihai Bozieru" }]
+dependencies = []
+
+[project.scripts]
+opsctl = "ops_toolkit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["ops_toolkit*"]
+

@@ -1,0 +1,19 @@
+{
+  "hosts": [
+    {
+      "name": "app-01",
+      "transport": "ssh",
+      "address": "10.20.10.11",
+      "user": "ops-reader",
+      "port": 22,
+      "connect_timeout_seconds": 8,
+      "checks": [
+        { "name": "uptime", "command": ["uptime"], "timeout_seconds": 10 },
+        { "name": "memory", "command": ["free", "-m"], "timeout_seconds": 10 },
+        { "name": "filesystems", "command": ["df", "-P", "-h"], "timeout_seconds": 10 },
+        { "name": "containers", "command": ["docker", "ps", "--format", "table {{.Names}}\\t{{.Status}}"], "timeout_seconds": 15 }
+      ]
+    }
+  ]
+}
+

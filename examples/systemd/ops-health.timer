@@ -1,0 +1,12 @@
+[Unit]
+Description=Run operational health reporting every hour
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=5m
+Unit=ops-health.service
+
+[Install]
+WantedBy=timers.target
+

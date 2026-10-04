@@ -1,0 +1,13 @@
+{
+  "endpoints": [
+    {
+      "name": "public-api",
+      "host": "example.com",
+      "port": 443,
+      "warning_days": 30,
+      "critical_days": 14,
+      "timeout_seconds": 8
+    }
+  ]
+}
+

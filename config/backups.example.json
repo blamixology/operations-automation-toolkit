@@ -1,0 +1,12 @@
+{
+  "backup_sets": [
+    {
+      "name": "postgres-nightly",
+      "path": "../examples/backups",
+      "pattern": "*.dump",
+      "minimum_files": 1,
+      "max_age_hours": 26
+    }
+  ]
+}
+
