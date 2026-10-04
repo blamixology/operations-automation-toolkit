@@ -6,4 +6,7 @@ build/
 *.egg-info/
 reports/*
 !reports/.gitkeep
-
+examples/backups/*
+!examples/backups/.gitkeep
+examples/logs/*
+!examples/logs/.gitkeep

@@ -5,6 +5,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from ops_toolkit.backups import check_backups
 from ops_toolkit.certificates import check_certificates
 from ops_toolkit.cleanup import CONFIRMATION, clean_expired
 from ops_toolkit.fleet import collect_fleet
+from ops_toolkit.restore import run_restore_drills
 
 
 class ToolkitTests(unittest.TestCase):
@@ -103,7 +105,40 @@ class ToolkitTests(unittest.TestCase):
             results = check_certificates(config, probe=lambda host, port, timeout: expiry)
             self.assertEqual(results[0].status, "WARN")
 
+    def test_restore_drill_extracts_and_verifies_required_paths(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            backups = root / "backups"
+            backups.mkdir()
+            with zipfile.ZipFile(backups / "export.zip", mode="w") as archive:
+                archive.writestr("metadata.json", "{}")
+                archive.writestr("data/export.json", "[]")
+            config = self.write_config(root, "restore.json", {
+                "archives": [{
+                    "name": "export", "path": "backups", "pattern": "*.zip",
+                    "max_files": 10, "max_expanded_bytes": 1024,
+                    "required_paths": ["metadata.json", "data/export.json"]
+                }]
+            })
+            result = run_restore_drills(config)[0]
+            self.assertEqual(result.status, "PASS")
+            self.assertIn("files=2", result.details)
+
+    def test_restore_drill_rejects_path_traversal(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            backups = root / "backups"
+            backups.mkdir()
+            with zipfile.ZipFile(backups / "malicious.zip", mode="w") as archive:
+                archive.writestr("../../escape.txt", "unsafe")
+            config = self.write_config(root, "restore.json", {
+                "archives": [{"name": "malicious", "path": "backups", "pattern": "*.zip"}]
+            })
+            result = run_restore_drills(config)[0]
+            self.assertEqual(result.status, "FAIL")
+            self.assertIn("unsafe archive path", result.details)
+            self.assertFalse((root.parent / "escape.txt").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
-

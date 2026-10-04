@@ -1,0 +1,16 @@
+{
+  "archives": [
+    {
+      "name": "application-export",
+      "path": "../examples/backups",
+      "pattern": "application-export-*.zip",
+      "max_files": 100,
+      "max_expanded_bytes": 10485760,
+      "required_paths": [
+        "metadata.json",
+        "data/export.json"
+      ]
+    }
+  ]
+}
+

@@ -9,6 +9,7 @@ from .certificates import check_certificates
 from .cleanup import CONFIRMATION, clean_expired
 from .common import CheckResult, exit_code, write_json_report
 from .fleet import collect_fleet, write_markdown
+from .restore import run_restore_drills
 
 
 def parser() -> argparse.ArgumentParser:
@@ -26,6 +27,10 @@ def parser() -> argparse.ArgumentParser:
     backups = commands.add_parser("backups", help="Check backup presence and freshness")
     backups.add_argument("--config", type=Path, required=True)
     backups.add_argument("--output", type=Path, default=Path("reports/backups.json"))
+
+    restore = commands.add_parser("restore", help="Safely restore and inspect the newest archive backup")
+    restore.add_argument("--config", type=Path, required=True)
+    restore.add_argument("--output", type=Path, default=Path("reports/restore.json"))
 
     cleanup = commands.add_parser("cleanup", help="Preview or apply file-retention rules")
     cleanup.add_argument("--config", type=Path, required=True)
@@ -52,6 +57,9 @@ def main(argv: list[str] | None = None) -> int:
         elif arguments.command == "backups":
             results = check_backups(arguments.config)
             write_json_report(arguments.output, results)
+        elif arguments.command == "restore":
+            results = run_restore_drills(arguments.config)
+            write_json_report(arguments.output, results)
         else:
             results = clean_expired(arguments.config, arguments.apply, arguments.confirm)
             write_json_report(arguments.output, results)
@@ -61,4 +69,3 @@ def main(argv: list[str] | None = None) -> int:
 
     _print_summary(results)
     return exit_code(results)
-
